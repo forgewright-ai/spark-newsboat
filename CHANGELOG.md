@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1
+
+- The first wait says what it is. Before the first answer byte the
+  screen shows `spark reads N characters ...`, a dot a second -- the
+  prefill on a big model is long, and a blank screen read as a hang.
+  The line erases itself the moment the answer starts. Measured on
+  the box: the article is barely reused between questions, so the
+  wait is real each time; warming it while the reader types is a
+  spark-core idea for another day.
+
 ## 1.1.0
 
 - The answer at a reader's pace: the wrapper pipes through `spark

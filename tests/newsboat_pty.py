@@ -186,6 +186,7 @@ def main():
         ok(b.expect("spark>"), "the macro opens the spark prompt", b.plain()[-200:])
         ok("the gate article" in b.plain(), "the prompt names the article (Title line)")
         b.send("\r")
+        ok(b.expect("characters"), "the pulse names the article's size at once", b.plain()[-200:])
         ok(b.expect("STUB-READ"), "Enter alone is the overview: the answer shows", b.plain()[-300:])
         got = logged()
         ok(got.strip() == "read", "spark read got no words -- the overview, no name, no path", got)

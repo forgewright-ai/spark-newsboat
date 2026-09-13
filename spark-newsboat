@@ -34,11 +34,34 @@ wrapw() {
         print line; fflush() }'
 }
 
+# The pulse: the first wait is the model reading the article (prefill),
+# and it is long on a big model -- say so at once, count the seconds,
+# and erase the line the moment the first answer byte arrives.
+pulse_start() {
+    printf 'spark reads %s characters ' "$1" > /dev/tty
+    ( while :; do sleep 1; printf '.' > /dev/tty; done ) 2>/dev/null &
+    PULSE=$!
+}
+
+pulse_stop() {
+    [ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null
+    PULSE=
+    printf '\r\033[2K' > /dev/tty
+}
+
 answer() {
     if spark reveal -h >/dev/null 2>&1; then
-        spark read "$@" 2>&1 | wrapw | spark reveal
+        spark read "$@" 2>&1 | {
+            IFS= read -r first || { pulse_stop; exit 0; }
+            pulse_stop
+            { printf '%s\n' "$first"; cat; } | wrapw | spark reveal
+        }
     else
-        spark read "$@" 2>&1 | wrapw
+        spark read "$@" 2>&1 | {
+            IFS= read -r first || { pulse_stop; exit 0; }
+            pulse_stop
+            { printf '%s\n' "$first"; cat; } | wrapw
+        }
     fi
 }
 
@@ -47,7 +70,7 @@ case ${1-} in
         art=$(cat)
         title=$(printf '%s\n' "$art" | sed -n 's/^Title: //p' | head -n 1)
         old=$(stty -g < /dev/tty 2>/dev/null || true)
-        trap 'printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
+        trap '[ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null; printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
         [ -z "$old" ] || stty sane < /dev/tty
         printf '\033[?1049h\033[2J\033[H' > /dev/tty
         [ -z "$title" ] || printf '%s\n\n' "$title" > /dev/tty
@@ -58,7 +81,9 @@ case ${1-} in
         set -- $q
         set +f
         printf '\n' > /dev/tty
+        pulse_start "$(printf %s "$art" | wc -c | tr -d ' ')"
         printf '%s\n' "$art" | answer "$@" > /dev/tty
+        [ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null
         printf '\n-- Enter returns to newsboat --' > /dev/tty
         IFS= read -r _ < /dev/tty || true
         printf '\033[?1049l' > /dev/tty
