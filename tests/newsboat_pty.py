@@ -184,7 +184,8 @@ def main():
         b = fresh()
         b.send(",s")
         ok(b.expect("spark>"), "the macro opens the spark prompt", b.plain()[-200:])
-        ok("the gate article" in b.plain(), "the prompt names the article (Title line)")
+        ok("Title: the gate article" in b.plain() and "Feed: probe feed" in b.plain(),
+           "the header stands above the prompt: feed and title, no screen-hopping", b.plain()[-300:])
         b.send("\r")
         ok(b.expect("characters"), "the pulse names the article's size at once", b.plain()[-200:])
         ok(b.expect("STUB-READ"), "Enter alone is the overview: the answer shows", b.plain()[-300:])

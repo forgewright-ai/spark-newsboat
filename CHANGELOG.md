@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- The whole header stands above the prompt -- Feed, Title, Author,
+  Date, Link, as newsboat composed them -- not the title alone: what
+  you are asking about, from where and when, without hopping back to
+  newsboat to remember.
+
 ## 1.1.2
 
 - The wait is animated: `spark reads N characters | 12s` -- an ASCII

@@ -78,12 +78,16 @@ answer() {
 case ${1-} in
     --ask)
         art=$(cat)
-        title=$(printf '%s\n' "$art" | sed -n 's/^Title: //p' | head -n 1)
+        # the header newsboat composed -- Feed, Title, Author, Date,
+        # Link -- shown whole, so the reader never leaves this screen
+        # to remember what they are asking about
+        header=$(printf '%s\n' "$art" \
+                 | awk 'NR > 12 || /^$/ { exit } /^(Feed|Title|Author|Date|Link|Podcast): / { print }')
         old=$(stty -g < /dev/tty 2>/dev/null || true)
         trap '[ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null; printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
         [ -z "$old" ] || stty sane < /dev/tty
         printf '\033[?1049h\033[2J\033[H' > /dev/tty
-        [ -z "$title" ] || printf '%s\n\n' "$title" > /dev/tty
+        [ -z "$header" ] || printf '%s\n\n' "$header" > /dev/tty
         printf 'spark> ' > /dev/tty
         IFS= read -r q < /dev/tty || q=
         case $q in "?"*) q=${q#?} ;; esac

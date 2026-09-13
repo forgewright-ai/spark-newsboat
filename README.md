@@ -9,7 +9,8 @@ not hold never reaches you. The second client of `spark read`, after
 spark-w3m.
 
 The key is newsboat's macro prefix: `,` then `s`. The screen is spark's
-for the exchange -- the article's title, then `spark> ` -- and Enter
+for the exchange -- the article's header (feed, title, date, link),
+then `spark> ` -- and Enter
 brings newsboat back exactly as it was:
 
     Enter or ?         the overview: what does this article cover?
