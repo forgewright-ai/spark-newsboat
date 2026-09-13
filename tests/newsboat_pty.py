@@ -30,7 +30,12 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSI = re.compile(r"\x1b(?:\[[0-9;?]*[ -/]*[@-~]|\([A-Za-z0-9]|\][^\x07\x1b]*(?:\x07|\x1b\\)|[@-Z\\-_])")
 
 STUB = r'''#!/bin/sh
-# the stub spark: log argv and stdin, answer one word
+# the stub spark: log argv and stdin, answer one word. `reveal` is the
+# pass-through pacer (1.31+): -h says it exists, otherwise copy -- and
+# it never touches the log, so the argv assertions stay about `read`.
+case ${1-} in
+    reveal) [ "${2-}" = "-h" ] && exit 0; exec cat ;;
+esac
 printf '%s\n' "$*" >> "$STUB_LOG"
 cat > "$STUB_LOG.stdin"
 case " $* " in

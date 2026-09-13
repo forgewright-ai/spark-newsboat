@@ -19,7 +19,11 @@ brings newsboat back exactly as it was:
                        count; this reads part 2
     Ctrl-C             never mind -- newsboat comes straight back
 
-The answer streams line by line as each quote clears the check. When
+The answer appears at a reader's pace: with spark 1.31 or newer each
+grounded line is revealed letter by letter (`spark reveal`;
+SPARK_REVEAL_CPS sets the speed), so the model composing the next
+line hides behind the reading of this one. An older spark shows each
+line whole as it clears the check. When
 the article does not answer, the reply is one line showing its own
 opening words -- never a guess.
 
