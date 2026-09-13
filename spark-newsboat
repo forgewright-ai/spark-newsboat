@@ -1,0 +1,42 @@
+#!/bin/sh
+# spark-newsboat -- `spark read` for a newsboat article: stderr folded
+# into the answer, so the refusal a source earns shows where the answer
+# would be instead of vanishing; long lines wrapped at spaces
+# (SPARK_NEWSBOAT_WIDTH sets the column, default 78).
+#
+# --ask is the macro's mode (,s in newsboat): newsboat pipes the
+# article in and hands the terminal over until the command returns,
+# repainting after -- so the whole screen is ours for the exchange.
+# Where the terminal has an alternate screen (every emulator; the Linux
+# console ignores the sequence and newsboat repaints anyway) the
+# article list is untouched underneath. Enter or ? alone is the
+# overview; words (a leading ?, the editors' habit, stripped) are the
+# question, flags like --part 2 ride along; Ctrl-C is never mind. The
+# words never glob (set -f) and never touch the article.
+W=${SPARK_NEWSBOAT_WIDTH:-78}
+case ${1-} in
+    --ask)
+        art=$(cat)
+        title=$(printf '%s\n' "$art" | sed -n 's/^Title: //p' | head -n 1)
+        old=$(stty -g < /dev/tty 2>/dev/null || true)
+        trap 'printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
+        [ -z "$old" ] || stty sane < /dev/tty
+        printf '\033[?1049h\033[2J\033[H' > /dev/tty
+        [ -z "$title" ] || printf '%s\n\n' "$title" > /dev/tty
+        printf 'spark> ' > /dev/tty
+        IFS= read -r q < /dev/tty || q=
+        case $q in "?"*) q=${q#?} ;; esac
+        set -f
+        set -- $q
+        set +f
+        printf '\n' > /dev/tty
+        printf '%s\n' "$art" | spark read "$@" 2>&1 | fold -s -w "$W" > /dev/tty
+        printf '\n-- Enter returns to newsboat --' > /dev/tty
+        IFS= read -r _ < /dev/tty || true
+        printf '\033[?1049l' > /dev/tty
+        trap - INT
+        [ -z "$old" ] || stty "$old" < /dev/tty
+        exit 0
+        ;;
+esac
+spark read "$@" 2>&1 | fold -s -w "$W"

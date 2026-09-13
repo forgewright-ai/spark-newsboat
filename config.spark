@@ -1,0 +1,30 @@
+# spark in newsboat -- your own AI, on your own machine
+# (spark.forgewright.ai). Append this to your own ~/.newsboat/config:
+#
+#     cat ~/.newsboat/spark/config.spark >> ~/.newsboat/config
+#
+# The key is newsboat's macro prefix: , then s. The article you are on
+# (open, or selected in the list) is piped to spark, the screen is
+# spark's for the exchange, and Enter brings newsboat back exactly as
+# it was:
+#
+#   Enter or ?         the overview: what does this article cover?
+#   your words         your question ("does it name a price"); a
+#                      leading ? works too, the editors' habit
+#   --part 2 words     an article past 16 kB answers with its part
+#                      count; this reads part 2
+#   Ctrl-C             never mind -- newsboat comes straight back
+#
+# Every line of the answer quotes the article; when the article does
+# not answer, the reply is one line showing its own opening words --
+# never a guess. spark-newsboat is this repository's wrapper around
+# `spark read`: it draws the prompt on the terminal newsboat hands
+# over, folds spark's stderr into the answer (a refusal shows instead
+# of vanishing) and wraps long lines at spaces (SPARK_NEWSBOAT_WIDTH,
+# default 78). Nothing leaves this machine but the rendered article
+# and your words, to the brain spark is configured for. Needs newsboat
+# 2.10 or newer and spark 1.20 or newer.
+macro s pipe-to "spark-newsboat --ask"
+# newsboat 2.38 or newer can put it on spark's key in every app,
+# Alt-s, beside the macro -- uncomment:
+# bind <ESC>s article,articlelist pipe-to "spark-newsboat --ask" -- "spark"
