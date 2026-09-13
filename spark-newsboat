@@ -35,11 +35,21 @@ wrapw() {
 }
 
 # The pulse: the first wait is the model reading the article (prefill),
-# and it is long on a big model -- say so at once, count the seconds,
-# and erase the line the moment the first answer byte arrives.
+# and it is long on a big model -- say so at once, spin, count the
+# seconds, and erase the line the moment the first answer byte
+# arrives. ASCII frames only: the box console draws nothing fancier.
 pulse_start() {
-    printf 'spark reads %s characters ' "$1" > /dev/tty
-    ( while :; do sleep 1; printf '.' > /dev/tty; done ) 2>/dev/null &
+    P_T0=$(date +%s)
+    ( n=0
+      while :; do
+          case $((n % 4)) in
+              0) f='|' ;; 1) f='/' ;; 2) f='-' ;; 3) f='\' ;;
+          esac
+          printf '\r\033[2Kspark reads %s characters  %s %ss' \
+              "$1" "$f" "$(( $(date +%s) - P_T0 ))" > /dev/tty
+          n=$((n + 1))
+          sleep 0.25
+      done ) 2>/dev/null &
     PULSE=$!
 }
 

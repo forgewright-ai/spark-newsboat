@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+- The wait is animated: `spark reads N characters | 12s` -- an ASCII
+  spinner and the elapsed seconds, redrawn in place four times a
+  second, erased the moment the answer starts. A counted, moving wait
+  reads as work; a still line read as a hang.
+
 ## 1.1.1
 
 - The first wait says what it is. Before the first answer byte the
