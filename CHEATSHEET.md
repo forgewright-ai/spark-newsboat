@@ -49,13 +49,13 @@ reader's pace, every line quoting the article (SPARK_REVEAL_CPS sets
 the letters a second; spark 1.31 or newer), and Enter brings
 newsboat back exactly as it was.
 
-    Enter or ?     the overview: what does this article cover?
-    your words     your question (a leading ? works too)
-    --part 2 words an article past 16 kB answers with its part
-                   count; this asks part 2
+    Enter or ?     the overview: every line quotes the article, or
+                   an honest refusal -- the verdict
+    your words     a conversation: follow-ups ride the thread, so
+                   "can you translate that?" has a that; an unheld
+                   quote is marked [not in the text], not silenced
     after an answer
-                   spark> again: a follow-up question of the same
-                   article; Enter alone returns to newsboat
+                   spark> again: follow up; Enter alone returns
     Ctrl-C         never mind -- newsboat comes straight back
 
 By example

@@ -30,9 +30,10 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSI = re.compile(r"\x1b(?:\[[0-9;?]*[ -/]*[@-~]|\([A-Za-z0-9]|\][^\x07\x1b]*(?:\x07|\x1b\\)|[@-Z\\-_])")
 
 STUB = r'''#!/bin/sh
-# the stub spark: log argv and stdin, answer one word. `reveal` is the
-# pass-through pacer (1.31+): -h says it exists, otherwise copy -- and
-# it never touches the log, so the argv assertions stay about `read`.
+# the stub spark: log argv and stdin, answer one word per verb --
+# STUB-READ for read, STUB-EDIT for edit. `reveal` is the pass-through
+# pacer (1.31+): -h says it exists, otherwise copy -- and it never
+# touches the log, so the argv assertions stay about the verbs.
 case ${1-} in
     reveal) [ "${2-}" = "-h" ] && exit 0; exec cat ;;
 esac
@@ -42,7 +43,10 @@ case " $* " in
     *" fail "*)   printf 'spark: the source does not answer -- it opens: "STUB-OPENING ..."\n' >&2; exit 1 ;;
     *" long "*)   i=0; while [ $i -lt 40 ]; do printf 'wrapword '; i=$((i+1)); done; printf '\n'; exit 0 ;;
 esac
-printf 'STUB-READ\n'
+case ${1-} in
+    edit) printf 'STUB-EDIT with a mark [not in the text]\n' ;;
+    *)    printf 'STUB-READ\n' ;;
+esac
 '''
 
 FEED = """<?xml version="1.0"?>
@@ -219,36 +223,28 @@ def main():
         ok(b.expect("gate article"), "newsboat is alive and repaints after the exchange", b.plain()[-200:])
         b.close()
 
-        # B. words at the prompt are the question; globs stay literal
+        # B. words at the prompt are the CONVERSATION: spark edit ? with
+        # a thread and the article's name; globs stay literal
         b = fresh()
         b.send(",s")
         b.expect("spark>")
         b.send("does it name a *price*\r")
-        b.expect("STUB-READ")
-        ok(logged().strip() == "read does it name a *price*",
-           "spark read got exactly the words, globs literal", logged())
+        b.expect("STUB-EDIT")
+        got = logged().strip()
+        ok(got.startswith("edit ? does it name a *price* --thread nb-")
+           and "--about a news article" in got and "--name the gate article" in got,
+           "the words run spark edit ? with thread, about and name", got)
         b.send("\r")
         b.close()
 
-        # C. the editors' habit: a leading ? is stripped
+        # C. the editors' habit: a leading ? is stripped (one ?, not two)
         b = fresh()
         b.send(",s")
         b.expect("spark>")
         b.send("?does it name a price\r")
-        b.expect("STUB-READ")
-        ok(logged().strip() == "read does it name a price",
+        b.expect("STUB-EDIT")
+        ok(logged().strip().startswith("edit ? does it name a price --thread nb-"),
            "a leading ? is stripped, the editors' habit", logged())
-        b.send("\r")
-        b.close()
-
-        # D. flags ride to spark read
-        b = fresh()
-        b.send(",s")
-        b.expect("spark>")
-        b.send("--part 2 what remains\r")
-        b.expect("STUB-READ")
-        ok(logged().strip() == "read --part 2 what remains",
-           "flags typed at the prompt ride to spark read", logged())
         b.send("\r")
         b.close()
 
@@ -273,17 +269,23 @@ def main():
         ok(b.expect("gate article"), "newsboat comes straight back after the cancel", b.plain()[-200:])
         b.close()
 
-        # F2. a follow-up: another question of the same article, no trip
-        # back to newsboat; the log carries both runs
+        # F2. a follow-up rides the SAME thread: the conversation law's whole
+        # point -- "can you translate that?" has a that
         b = fresh()
         b.send(",s")
         b.expect("spark>")
         b.send("first question\r")
-        b.expect("STUB-READ")
+        b.expect("STUB-EDIT")
         b.send("second question\r")
-        ok(b.expect("STUB-READ", 15) and logged().strip().split("\n") == [
-            "read first question", "read second question"],
-           "a second question runs in the same screen", logged())
+        b.expect("STUB-EDIT", 15)
+        lines = logged().strip().split("\n")
+        def tid(l):
+            w = l.split()
+            return w[w.index("--thread") + 1] if "--thread" in w else "?" + l
+        ok(len(lines) == 2 and lines[0].startswith("edit ? first question")
+           and lines[1].startswith("edit ? second question")
+           and tid(lines[0]) == tid(lines[1]),
+           "the follow-up rides the same thread", logged())
         b.send("\r")
         b.close()
 

@@ -1,17 +1,18 @@
 #!/bin/sh
-# spark-newsboat -- `spark read` for a newsboat article: stderr folded
-# into the answer, so the refusal a source earns shows where the answer
-# would be instead of vanishing; long lines wrapped at spaces
-# (SPARK_NEWSBOAT_WIDTH sets the column, default 78).
+# spark-newsboat -- the article, in the room with spark. Two laws, one
+# screen: Enter alone is the OVERVIEW (`spark read`, the verdict law:
+# every line quotes the article or the reply is an honest refusal);
+# your words are a CONVERSATION (`spark edit ?` with a thread, the
+# conversation law: follow-ups ride the earlier turns, so "can you translate
+# that?" has a that; a quote the article does not hold is marked
+# [not in the text] where it stands instead of being silenced).
 #
 # --ask is the macro's mode (,s in newsboat): newsboat pipes the
 # article in and hands the terminal over until the command returns,
 # repainting after -- so the whole screen is ours for the exchange.
 # Where the terminal has an alternate screen (every emulator; the Linux
 # console ignores the sequence and newsboat repaints anyway) the
-# article list is untouched underneath. Enter or ? alone is the
-# overview; words (a leading ?, the editors' habit, stripped) are the
-# question, flags like --part 2 ride along; Ctrl-C is never mind. The
+# article list is untouched underneath. Ctrl-C is never mind. The
 # words never glob (set -f) and never touch the article.
 #
 # The answer is revealed at a reader's pace when this spark has
@@ -61,13 +62,13 @@ pulse_stop() {
 
 answer() {
     if spark reveal -h >/dev/null 2>&1; then
-        spark read "$@" 2>&1 | {
+        "$@" 2>&1 | {
             IFS= read -r first || { pulse_stop; exit 0; }
             pulse_stop
             { printf '%s\n' "$first"; cat; } | wrapw | spark reveal
         }
     else
-        spark read "$@" 2>&1 | {
+        "$@" 2>&1 | {
             IFS= read -r first || { pulse_stop; exit 0; }
             pulse_stop
             { printf '%s\n' "$first"; cat; } | wrapw
@@ -83,6 +84,8 @@ case ${1-} in
         # to remember what they are asking about
         header=$(printf '%s\n' "$art" \
                  | awk 'NR > 12 || /^$/ { exit } /^(Feed|Title|Author|Date|Link|Podcast): / { print }')
+        title=$(printf '%s\n' "$header" | sed -n 's/^Title: //p' | head -n 1)
+        thread="nb-$(date +%s)-$$"
         # a stub: a link feed carries a headline and pointers, not the
         # story -- fewer than 120 non-space characters once the URLs
         # are set aside. Say so instead of earning a confusing refusal;
@@ -113,6 +116,15 @@ case ${1-} in
             set -f
             set -- $q
             set +f
+            if [ $# -eq 0 ]; then
+                # the overview: the verdict law, one grounded answer
+                set -- spark read
+            else
+                # the conversation: the conversation law, threaded follow-ups
+                set -- '?' "$@" --thread "$thread" --about "a news article"
+                [ -z "$title" ] || set -- "$@" --name "$title"
+                set -- spark edit "$@"
+            fi
             printf '\n' > /dev/tty
             pulse_start "$(printf %s "$art" | wc -c | tr -d ' ')"
             printf '%s\n' "$art" | answer "$@" > /dev/tty

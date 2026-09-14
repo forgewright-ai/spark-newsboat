@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.0
+
+- Two laws, one screen. Enter alone stays the overview under the
+  verdict law (`spark read`: every line quotes the article, or an
+  honest refusal). Your words now open a CONVERSATION under the conversation
+  law (`spark edit ?` with a per-visit thread): follow-ups ride the
+  earlier turns -- "can you translate that?" finally has a that --
+  and a quote the article does not hold is marked [not in the text]
+  where it stands instead of being silenced. The article's title
+  rides as --name, "a news article" as --about. The --part grammar
+  leaves with the verdict-only session; a long article is clipped
+  with a visible cut mark, the editors' way. From the maintainer's
+  evening with a Portuguese article and an English question.
+
 ## 1.2.0
 
 - The exchange is a loop: after an answer, `spark> ` again -- another

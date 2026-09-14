@@ -8,13 +8,12 @@
 # spark's for the exchange, and Enter brings newsboat back exactly as
 # it was:
 #
-#   Enter or ?         the overview: what does this article cover?
-#   your words         your question ("does it name a price"); a
-#                      leading ? works too, the editors' habit
-#   --part 2 words     an article past 16 kB answers with its part
-#                      count; this reads part 2
-#   after an answer    spark> again: another question of the same
-#                      article; Enter alone returns to newsboat
+#   Enter or ?         the overview: every line quotes the article,
+#                      or an honest refusal -- the verdict
+#   your words         a conversation: follow-ups ride the thread
+#                      ("can you translate that?" has a that); an
+#                      unheld quote is marked [not in the text]
+#   after an answer    spark> again: follow up; Enter alone returns
 #   Ctrl-C             never mind -- newsboat comes straight back
 #
 # A link feed's stub (a headline and pointers, no story) is named

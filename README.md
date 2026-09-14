@@ -2,11 +2,12 @@
 
 spark (https://spark.forgewright.ai) is your own AI on your own machine;
 this plugin puts it under one key in newsboat, the RSS reader. The
-article you are on -- open, or selected in the list -- is piped to
-`spark read`, and the answer says only what the article says: every
-line quotes it, and the quote is checked -- a claim the article does
-not hold never reaches you. The second client of `spark read`, after
-spark-w3m.
+article you are on -- open, or selected in the list -- comes into the
+room with spark: the overview answers under the verdict law (`spark
+read`: every line quotes the article, or an honest refusal), and your
+words open a conversation under the conversation law (`spark edit ?` with a
+thread: follow-ups carry the earlier turns, and an unheld quote is
+marked where it stands).
 
 The key is newsboat's macro prefix: `,` then `s`. The screen is spark's
 for the exchange -- the article's header (feed, title, date, link),
@@ -14,12 +15,14 @@ then `spark> ` -- and Enter
 brings newsboat back exactly as it was:
 
     Enter or ?         the overview: what does this article cover?
-    your words         your question ("does it name a price"); a
-                       leading ? works too, the editors' habit
-    --part 2 words     an article past 16 kB answers with its part
-                       count; this reads part 2
-    after an answer    spark> again: another question of the same
-                       article; Enter alone returns to newsboat
+                       -- the verdict law: every line quotes the
+                       article, or the reply is an honest refusal
+    your words         a conversation about it -- the conversation law:
+                       follow-ups ride the thread, so "can you
+                       translate that?" has a that; a quote the
+                       article does not hold is marked
+                       [not in the text], never silenced
+    after an answer    spark> again: follow up; Enter alone returns
     Ctrl-C             never mind -- newsboat comes straight back
 
 The answer appears at a reader's pace: with spark 1.31 or newer each
