@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.1
+
+- A one-line answer with no trailing newline was eaten as silence:
+  `read` fills its variable at such an EOF but returns nonzero, and
+  the first-line guard took that for an empty stream. spark edit
+  streams raw -- a small summary is exactly one unterminated line.
+  The stub now answers without a trailing newline, so the suite
+  holds the door open forever.
+
 ## 2.0.0
 
 - Two laws, one screen. Enter alone stays the overview under the

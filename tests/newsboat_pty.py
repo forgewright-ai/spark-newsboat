@@ -44,7 +44,7 @@ case " $* " in
     *" long "*)   i=0; while [ $i -lt 40 ]; do printf 'wrapword '; i=$((i+1)); done; printf '\n'; exit 0 ;;
 esac
 case ${1-} in
-    edit) printf 'STUB-EDIT with a mark [not in the text]\n' ;;
+    edit) printf 'STUB-EDIT with a mark [not in the text]' ;;   # NO trailing newline: raw stream
     *)    printf 'STUB-READ\n' ;;
 esac
 '''

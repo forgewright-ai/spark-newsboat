@@ -60,16 +60,21 @@ pulse_stop() {
     printf '\r\033[2K' > /dev/tty
 }
 
+# read fills its variable even when the stream ends without a final
+# newline, but returns nonzero -- a one-line answer with no trailing
+# newline (spark edit streams raw) must not be mistaken for silence.
 answer() {
     if spark reveal -h >/dev/null 2>&1; then
         "$@" 2>&1 | {
-            IFS= read -r first || { pulse_stop; exit 0; }
+            IFS= read -r first; r=$?
+            [ -n "$first" ] || [ $r -eq 0 ] || { pulse_stop; exit 0; }
             pulse_stop
             { printf '%s\n' "$first"; cat; } | wrapw | spark reveal
         }
     else
         "$@" 2>&1 | {
-            IFS= read -r first || { pulse_stop; exit 0; }
+            IFS= read -r first; r=$?
+            [ -n "$first" ] || [ $r -eq 0 ] || { pulse_stop; exit 0; }
             pulse_stop
             { printf '%s\n' "$first"; cat; } | wrapw
         }
