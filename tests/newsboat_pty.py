@@ -311,6 +311,19 @@ def main():
         ok(b.expect("link only"), "newsboat is back after the stub visit", b.plain()[-200:])
         b.close()
 
+        # F4. the quit grammar: q (the family's close key) returns to
+        # newsboat from a FRESH session too, and never reaches the model
+        b = fresh()
+        b.send(",s")
+        b.expect("spark>")
+        b.mark()
+        b.send("q\r")
+        time.sleep(0.8)
+        ok(not os.path.exists(log), "q at the prompt runs nothing")
+        b.send("q")
+        ok(b.expect("gate article"), "q returns to newsboat, fresh session or not", b.plain()[-200:])
+        b.close()
+
         # G. ,s from the article LIST pipes the selected article too
         b = fresh(open_article=False)
         b.send(",s")

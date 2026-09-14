@@ -114,6 +114,13 @@ case ${1-} in
         while :; do
             printf 'spark> ' > /dev/tty
             IFS= read -r q < /dev/tty || break
+            # the family's quit grammar (spark chat's QUIT_WORDS, plus
+            # newsboat's own q): a quit word must never reach the
+            # model, which would role-play an exit -- the first-session
+            # trap the chat REPL learned first
+            case $q in
+                q|/q|/quit|/exit|:q|:quit|:wq|quit|exit|bye) break ;;
+            esac
             if [ -z "$q" ]; then
                 [ -z "$asked" ] && [ -z "$stub" ] || break
             fi

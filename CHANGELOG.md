@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0
+
+- The family's quit grammar: q at the prompt returns to newsboat, any
+  time -- fresh session or mid-conversation -- and so do :q, /q,
+  quit, exit and the rest of spark chat's QUIT_WORDS. A quit word
+  never reaches the model, which would role-play an exit; the
+  editors' panes close on q, and this room now does too.
+
 ## 2.0.1
 
 - A one-line answer with no trailing newline was eaten as silence:

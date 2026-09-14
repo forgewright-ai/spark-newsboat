@@ -14,7 +14,8 @@
 #                      ("can you translate that?" has a that); an
 #                      unheld quote is marked [not in the text]
 #   after an answer    spark> again: follow up; Enter alone returns
-#   Ctrl-C             never mind -- newsboat comes straight back
+#   q                  back to newsboat, any time (:q, quit, exit
+#                      work too); Ctrl-C is never mind
 #
 # A link feed's stub (a headline and pointers, no story) is named
 # instead of asked: "this feed carried only a stub -- o opens the

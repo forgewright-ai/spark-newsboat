@@ -56,6 +56,8 @@ newsboat back exactly as it was.
                    quote is marked [not in the text], not silenced
     after an answer
                    spark> again: follow up; Enter alone returns
+    q              back to newsboat, any time (:q, quit, exit work
+                   too -- the family's quit grammar)
     Ctrl-C         never mind -- newsboat comes straight back
 
 By example

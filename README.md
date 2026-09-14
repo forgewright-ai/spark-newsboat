@@ -23,7 +23,8 @@ brings newsboat back exactly as it was:
                        article does not hold is marked
                        [not in the text], never silenced
     after an answer    spark> again: follow up; Enter alone returns
-    Ctrl-C             never mind -- newsboat comes straight back
+    q                  back to newsboat, any time (:q, quit, exit
+                       work too); Ctrl-C is never mind
 
 The answer appears at a reader's pace: with spark 1.31 or newer each
 grounded line is revealed letter by letter (`spark reveal`;
