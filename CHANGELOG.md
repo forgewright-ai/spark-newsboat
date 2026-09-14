@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.4.0
+
+- The room is dressed: the title in bold, one meta line (feed,
+  author, date) and the link in colour, a rule across the width, then
+  the hello. The width follows the terminal (up to 100 columns) --
+  the answer no longer huddles in the left half of a wide console.
+- The about-hint says what the room is: "a published article the
+  reader is discussing with you -- not a draft to review". It steers
+  the editor's reviewing posture ("I don't see any changes needed")
+  out of a reading conversation; a hint steers, the model decides.
+
 ## 2.3.0
 
 - The room says hello -- `hello <user> -- let's talk about it.` under

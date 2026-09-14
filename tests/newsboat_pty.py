@@ -204,8 +204,8 @@ def main():
         b = fresh()
         b.send(",s")
         ok(b.expect("chat>"), "the macro opens the spark prompt", b.plain()[-200:])
-        ok("Title: the gate article" in b.plain() and "Feed: probe feed" in b.plain(),
-           "the header stands above the prompt: feed and title, no screen-hopping", b.plain()[-300:])
+        ok("the gate article" in b.plain() and "probe feed" in b.plain() and "----" in b.plain(),
+           "the card stands above the prompt: title, meta line, a rule", b.plain()[-300:])
         ok(b.expect("hello"), "the room says hello before the first prompt", b.plain()[-200:])
         b.send("\r")
         ok(b.expect("reading") and b.expect("characters"),
@@ -234,7 +234,7 @@ def main():
         b.expect("STUB-EDIT")
         got = logged().strip()
         ok(got.startswith("edit ? does it name a *price* --thread nb-")
-           and "--about a news article" in got and "--name the gate article" in got,
+           and "--about a published article" in got and "--name the gate article" in got,
            "the words run spark edit ? with thread, about and name", got)
         b.send("\r")
         b.close()

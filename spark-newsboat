@@ -86,6 +86,14 @@ answer() {
 case ${1-} in
     --ask)
         art=$(cat)
+        # the room's width: the terminal's, within reading reason
+        if [ -z "${SPARK_NEWSBOAT_WIDTH-}" ]; then
+            set -- $(stty size < /dev/tty 2>/dev/null || echo "0 80")
+            W=$(( ${2:-80} - 2 ))
+            [ "$W" -gt 100 ] && W=100
+            [ "$W" -lt 40 ] && W=78
+        fi
+        B="$(printf '\033[1m')"; C="$(printf '\033[36m')"; R="$(printf '\033[0m')"
         # the header newsboat composed -- Feed, Title, Author, Date,
         # Link -- shown whole, so the reader never leaves this screen
         # to remember what they are asking about
@@ -106,8 +114,18 @@ case ${1-} in
         trap '[ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null; printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
         [ -z "$old" ] || stty sane < /dev/tty
         printf '\033[?1049h\033[2J\033[H' > /dev/tty
-        [ -z "$header" ] || printf '%s\n\n' "$header" > /dev/tty
-        printf "hello %s -- let's talk about it.\n\n" "${USER:-there}" > /dev/tty
+        feed=$(printf '%s\n' "$header" | sed -n 's/^Feed: //p' | head -n 1)
+        author=$(printf '%s\n' "$header" | sed -n 's/^Author: //p' | head -n 1)
+        adate=$(printf '%s\n' "$header" | sed -n 's/^Date: //p' | head -n 1)
+        link=$(printf '%s\n' "$header" | sed -n 's/^Link: //p' | head -n 1)
+        [ -z "$title" ] || printf '%s%s%s\n' "$B" "$title" "$R" > /dev/tty
+        meta=$feed
+        [ -z "$author" ] || meta="$meta -- $author"
+        [ -z "$adate" ] || meta="$meta -- $adate"
+        [ -z "$meta" ] || printf '%s%s%s\n' "$C" "$meta" "$R" > /dev/tty
+        [ -z "$link" ] || printf '%s%s%s\n' "$C" "$link" "$R" > /dev/tty
+        printf '%s\n' "$(printf '%*s' "$W" "" | tr " " "-")" > /dev/tty
+        printf "\nhello %s -- let's talk about it.\n\n" "${USER:-there}" > /dev/tty
         [ -z "$stub" ] || printf 'this feed carried only a stub -- o opens the story in w3m; M-s asks there\n\n' > /dev/tty
         # the exchange is a loop: another question of the same article
         # costs no trip back to newsboat. The first Enter alone is the
@@ -115,7 +133,7 @@ case ${1-} in
         # an answer, Enter alone returns to newsboat.
         asked=
         while :; do
-            printf 'chat> ' > /dev/tty
+            printf '%schat>%s ' "$B" "$R" > /dev/tty
             IFS= read -r q < /dev/tty || break
             # the family's quit grammar (spark chat's QUIT_WORDS, plus
             # newsboat's own q): a quit word must never reach the
@@ -136,7 +154,7 @@ case ${1-} in
                 set -- spark read
             else
                 # the conversation: the conversation law, threaded follow-ups
-                set -- '?' "$@" --thread "$thread" --about "a news article"
+                set -- '?' "$@" --thread "$thread" --about "a published article the reader is discussing with you -- not a draft to review"
                 [ -z "$title" ] || set -- "$@" --name "$title"
                 set -- spark edit "$@"
             fi
