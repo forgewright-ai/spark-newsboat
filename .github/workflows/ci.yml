@@ -24,7 +24,7 @@ jobs:
           for f in README.md CHANGELOG.md CHEATSHEET.md CREDITS.md LICENSE config.spark spark-newsboat; do
             ! LC_ALL=C grep -n "[^ -~${tab}]" "$f"; done
       - name: newsboat
-        run: sudo apt-get install -y -qq newsboat >/dev/null && newsboat --version | head -1
+        run: sudo apt-get install -y -qq newsboat >/dev/null 2>&1 && newsboat --version | head -1 || echo "newsboat is not in this Ubuntu -- the pty test skips (Arch and macOS run it)"
       - name: the plugin in a pty
         run: python3 tests/newsboat_pty.py
   arch:
