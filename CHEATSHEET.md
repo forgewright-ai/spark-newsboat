@@ -44,7 +44,7 @@ front rests one.
 
 One macro: `,s` -- on the article you are reading, or the one
 selected in the list. The screen is spark's for the exchange: the
-article's header -- feed, title, date, link -- then `spark> `. The answer is revealed at a
+article's header -- feed, title, date, link -- then `chat> `. The answer is revealed at a
 reader's pace, every line quoting the article (SPARK_REVEAL_CPS sets
 the letters a second; spark 1.31 or newer), and Enter brings
 newsboat back exactly as it was.
@@ -55,7 +55,7 @@ newsboat back exactly as it was.
                    "can you translate that?" has a that; an unheld
                    quote is marked [not in the text], not silenced
     after an answer
-                   spark> again: follow up; Enter alone returns
+                   chat> again: follow up; Enter alone returns
     q              back to newsboat, any time (:q, quit, exit work
                    too -- the family's quit grammar)
     Ctrl-C         never mind -- newsboat comes straight back

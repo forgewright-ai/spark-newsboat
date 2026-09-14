@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0
+
+- The prompt says what the room is: `chat> `, not `spark> `. The
+  session is a discussion about one article -- threaded, stateful --
+  and the house learned this name at the chat REPL first (spark>
+  reads as a monolog). The editors keep spark>: theirs is the command
+  grammar; this is a conversation.
+
 ## 2.1.0
 
 - The family's quit grammar: q at the prompt returns to newsboat, any

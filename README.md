@@ -11,7 +11,7 @@ marked where it stands).
 
 The key is newsboat's macro prefix: `,` then `s`. The screen is spark's
 for the exchange -- the article's header (feed, title, date, link),
-then `spark> ` -- and Enter
+then `chat> ` -- and Enter
 brings newsboat back exactly as it was:
 
     Enter or ?         the overview: what does this article cover?
@@ -22,7 +22,7 @@ brings newsboat back exactly as it was:
                        translate that?" has a that; a quote the
                        article does not hold is marked
                        [not in the text], never silenced
-    after an answer    spark> again: follow up; Enter alone returns
+    after an answer    chat> again: follow up; Enter alone returns
     q                  back to newsboat, any time (:q, quit, exit
                        work too); Ctrl-C is never mind
 

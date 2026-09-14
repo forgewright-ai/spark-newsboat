@@ -203,7 +203,7 @@ def main():
         # navigable after the exchange
         b = fresh()
         b.send(",s")
-        ok(b.expect("spark>"), "the macro opens the spark prompt", b.plain()[-200:])
+        ok(b.expect("chat>"), "the macro opens the spark prompt", b.plain()[-200:])
         ok("Title: the gate article" in b.plain() and "Feed: probe feed" in b.plain(),
            "the header stands above the prompt: feed and title, no screen-hopping", b.plain()[-300:])
         b.send("\r")
@@ -227,7 +227,7 @@ def main():
         # a thread and the article's name; globs stay literal
         b = fresh()
         b.send(",s")
-        b.expect("spark>")
+        b.expect("chat>")
         b.send("does it name a *price*\r")
         b.expect("STUB-EDIT")
         got = logged().strip()
@@ -240,7 +240,7 @@ def main():
         # C. the editors' habit: a leading ? is stripped (one ?, not two)
         b = fresh()
         b.send(",s")
-        b.expect("spark>")
+        b.expect("chat>")
         b.send("?does it name a price\r")
         b.expect("STUB-EDIT")
         ok(logged().strip().startswith("edit ? does it name a price --thread nb-"),
@@ -251,7 +251,7 @@ def main():
         # E. a refusal on spark's stderr shows on screen
         b = fresh()
         b.send(",s")
-        b.expect("spark>")
+        b.expect("chat>")
         b.send("fail\r")
         ok(b.expect("STUB-OPENING"), "a refusal shows where the answer would be", b.plain()[-300:])
         b.send("\r")
@@ -260,7 +260,7 @@ def main():
         # F. Ctrl-C at the prompt runs nothing; newsboat comes back
         b = fresh()
         b.send(",s")
-        b.expect("spark>")
+        b.expect("chat>")
         b.send("\x03")
         time.sleep(0.6)
         ok(not os.path.exists(log), "Ctrl-C at the prompt runs nothing")
@@ -273,7 +273,7 @@ def main():
         # point -- "can you translate that?" has a that
         b = fresh()
         b.send(",s")
-        b.expect("spark>")
+        b.expect("chat>")
         b.send("first question\r")
         b.expect("STUB-EDIT")
         b.send("second question\r")
@@ -315,7 +315,7 @@ def main():
         # newsboat from a FRESH session too, and never reaches the model
         b = fresh()
         b.send(",s")
-        b.expect("spark>")
+        b.expect("chat>")
         b.mark()
         b.send("q\r")
         time.sleep(0.8)
@@ -327,7 +327,7 @@ def main():
         # G. ,s from the article LIST pipes the selected article too
         b = fresh(open_article=False)
         b.send(",s")
-        ok(b.expect("spark>"), "the macro works from the article list")
+        ok(b.expect("chat>"), "the macro works from the article list")
         b.send("\r")
         b.expect("STUB-READ")
         with open(log + ".stdin") as f:

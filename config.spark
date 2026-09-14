@@ -13,7 +13,7 @@
 #   your words         a conversation: follow-ups ride the thread
 #                      ("can you translate that?" has a that); an
 #                      unheld quote is marked [not in the text]
-#   after an answer    spark> again: follow up; Enter alone returns
+#   after an answer    chat> again: follow up; Enter alone returns
 #   q                  back to newsboat, any time (:q, quit, exit
 #                      work too); Ctrl-C is never mind
 #
