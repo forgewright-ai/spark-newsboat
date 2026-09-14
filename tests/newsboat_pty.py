@@ -206,8 +206,10 @@ def main():
         ok(b.expect("chat>"), "the macro opens the spark prompt", b.plain()[-200:])
         ok("Title: the gate article" in b.plain() and "Feed: probe feed" in b.plain(),
            "the header stands above the prompt: feed and title, no screen-hopping", b.plain()[-300:])
+        ok(b.expect("hello"), "the room says hello before the first prompt", b.plain()[-200:])
         b.send("\r")
-        ok(b.expect("characters"), "the pulse names the article's size at once", b.plain()[-200:])
+        ok(b.expect("reading") and b.expect("characters"),
+           "the first wait reads the article, and says so", b.plain()[-200:])
         ok(b.expect("STUB-READ"), "Enter alone is the overview: the answer shows", b.plain()[-300:])
         got = logged()
         ok(got.strip() == "read", "spark read got no words -- the overview, no name, no path", got)
@@ -277,6 +279,7 @@ def main():
         b.send("first question\r")
         b.expect("STUB-EDIT")
         b.send("second question\r")
+        ok(b.expect("thinking", 15), "a follow-up's wait is thinking, not re-reading")
         b.expect("STUB-EDIT", 15)
         lines = logged().strip().split("\n")
         def tid(l):

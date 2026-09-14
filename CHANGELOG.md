@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.3.0
+
+- The room says hello -- `hello <user> -- let's talk about it.` under
+  the header, so the screen opens as a conversation, not a form.
+- The wait speaks conversationally and truthfully: `reading N
+  characters` on the first exchange (the model takes the article in),
+  `thinking` on every turn after -- the article is already in the
+  thread, and saying "reads N characters" again was a small lie.
+
 ## 2.2.0
 
 - The prompt says what the room is: `chat> `, not `spark> `. The
