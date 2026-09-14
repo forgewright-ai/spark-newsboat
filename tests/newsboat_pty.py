@@ -50,7 +50,17 @@ FEED = """<?xml version="1.0"?>
 <link>http://192.0.2.1/</link><description>probe</description>
 <item><title>the gate article</title><link>http://192.0.2.1/a</link>
 <description>The gate opens at nine and closes at noon.
-Tickets are two dollars, free for children.</description></item>
+Tickets are two dollars, free for children. The orchard stall sells
+cider on weekends through October, and the west meadow is open for
+picnics whenever the flag is up by the old gate.</description></item>
+</channel></rss>
+"""
+
+STUBFEED = """<?xml version="1.0"?>
+<rss version="2.0"><channel><title>stub feed</title>
+<link>http://192.0.2.1/s</link><description>stubs</description>
+<item><title>a link only</title><link>http://192.0.2.1/b</link>
+<description>Comments: http://192.0.2.1/c</description></item>
 </channel></rss>
 """
 
@@ -149,9 +159,15 @@ def main():
         feed = os.path.join(work, "feed.xml")
         with open(feed, "w") as f:
             f.write(FEED)
+        stubfeed = os.path.join(work, "stubfeed.xml")
+        with open(stubfeed, "w") as f:
+            f.write(STUBFEED)
         urls = os.path.join(tmp, "urls")
         with open(urls, "w") as f:
             f.write("file://%s\n" % feed)
+        urls2 = os.path.join(tmp, "urls2")
+        with open(urls2, "w") as f:
+            f.write("file://%s\n" % stubfeed)
         cache = os.path.join(tmp, "cache.db")
         env = {"HOME": tmp, "TERM": "xterm", "PATH": bindir + ":" + os.environ.get("PATH", "/usr/bin:/bin"),
                "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "STUB_LOG": log}
@@ -196,9 +212,9 @@ def main():
         ok("Title: the gate article" in stdin and "gate opens at nine" in stdin,
            "the rendered article travelled on stdin, header and text", repr(stdin[:150]))
         ok(tmp not in stdin and "feed.xml" not in stdin, "no path reaches spark", repr(stdin[:150]))
-        ok(b.expect("Enter returns"), "the answer waits for the reader")
+        b.read(0.5)
         b.mark()
-        b.send("\r")            # leave the answer
+        b.send("\r")            # empty prompt after an answer: return
         b.send("q")             # article -> article list: newsboat repaints
         ok(b.expect("gate article"), "newsboat is alive and repaints after the exchange", b.plain()[-200:])
         b.close()
@@ -255,6 +271,42 @@ def main():
         b.mark()
         b.send("q")
         ok(b.expect("gate article"), "newsboat comes straight back after the cancel", b.plain()[-200:])
+        b.close()
+
+        # F2. a follow-up: another question of the same article, no trip
+        # back to newsboat; the log carries both runs
+        b = fresh()
+        b.send(",s")
+        b.expect("spark>")
+        b.send("first question\r")
+        b.expect("STUB-READ")
+        b.send("second question\r")
+        ok(b.expect("STUB-READ", 15) and logged().strip().split("\n") == [
+            "read first question", "read second question"],
+           "a second question runs in the same screen", logged())
+        b.send("\r")
+        b.close()
+
+        # F3. a stub article says so instead of refusing; Enter returns
+        # (its own instance, its own single feed: no list navigation)
+        if os.path.exists(log):
+            os.unlink(log)
+        b = Reader([newsboat, "-u", urls2, "-c", os.path.join(tmp, "cache2.db"),
+                    "-C", config, "-r"], env, work)
+        ok(b.expect("stub feed"), "the stub feed draws")
+        b.send("\r")
+        b.expect("link only")
+        b.send("\r")            # open the stub article
+        b.expect("Comments")
+        b.mark()
+        b.send(",s")
+        ok(b.expect("only a stub"), "a stub is named, not sent", b.plain()[-300:])
+        b.send("\r")            # Enter on a stub: nothing to overview, return
+        time.sleep(0.6)
+        ok(not os.path.exists(log), "nothing was sent for the stub")
+        b.mark()
+        b.send("q")
+        ok(b.expect("link only"), "newsboat is back after the stub visit", b.plain()[-200:])
         b.close()
 
         # G. ,s from the article LIST pipes the selected article too

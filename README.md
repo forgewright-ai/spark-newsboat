@@ -18,6 +18,8 @@ brings newsboat back exactly as it was:
                        leading ? works too, the editors' habit
     --part 2 words     an article past 16 kB answers with its part
                        count; this reads part 2
+    after an answer    spark> again: another question of the same
+                       article; Enter alone returns to newsboat
     Ctrl-C             never mind -- newsboat comes straight back
 
 The answer appears at a reader's pace: with spark 1.31 or newer each
@@ -26,7 +28,9 @@ SPARK_REVEAL_CPS sets the speed), so the model composing the next
 line hides behind the reading of this one. An older spark shows each
 line whole as it clears the check. When
 the article does not answer, the reply is one line showing its own
-opening words -- never a guess.
+opening words -- never a guess. A link feed's stub (a headline and
+pointers, no story) is named instead of asked, with the road to the
+real page.
 
 ## Install
 

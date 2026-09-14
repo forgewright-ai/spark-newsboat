@@ -13,7 +13,13 @@
 #                      leading ? works too, the editors' habit
 #   --part 2 words     an article past 16 kB answers with its part
 #                      count; this reads part 2
+#   after an answer    spark> again: another question of the same
+#                      article; Enter alone returns to newsboat
 #   Ctrl-C             never mind -- newsboat comes straight back
+#
+# A link feed's stub (a headline and pointers, no story) is named
+# instead of asked: "this feed carried only a stub -- o opens the
+# story in w3m; M-s asks there".
 #
 # Every line of the answer quotes the article; when the article does
 # not answer, the reply is one line showing its own opening words --

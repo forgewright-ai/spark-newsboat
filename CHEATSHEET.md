@@ -53,6 +53,9 @@ newsboat back exactly as it was.
     your words     your question (a leading ? works too)
     --part 2 words an article past 16 kB answers with its part
                    count; this asks part 2
+    after an answer
+                   spark> again: a follow-up question of the same
+                   article; Enter alone returns to newsboat
     Ctrl-C         never mind -- newsboat comes straight back
 
 By example

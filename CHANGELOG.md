@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+
+- The exchange is a loop: after an answer, `spark> ` again -- another
+  question of the same article without a trip back to newsboat; Enter
+  alone returns. The first Enter stays the overview.
+- A stub is named, not asked: a link feed's article (a headline and
+  pointers, fewer than 120 story characters once URLs are set aside)
+  gets "this feed carried only a stub -- o opens the story in w3m;
+  M-s asks there" instead of a refusal that read as a malfunction.
+  Words still ask; Enter returns.
+
 ## 1.1.3
 
 - The whole header stands above the prompt -- Feed, Title, Author,
