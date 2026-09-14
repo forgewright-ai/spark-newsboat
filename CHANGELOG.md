@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.5.0
+
+- The conversation asks in the reading-discussion posture. spark 1.32
+  gained `spark edit ? --source` -- the text is a published source you
+  discuss, not a draft you edit -- and the wrapper passes it, guarded,
+  so an older spark is unchanged. This is the posture the 2.4.0
+  about-hint reached for by words alone; the flag makes it the brief,
+  and the long "not a draft to review" hint shrinks back to "a news
+  article".
+
 ## 2.4.0
 
 - The room is dressed: the title in bold, one meta line (feed,

@@ -37,6 +37,10 @@ STUB = r'''#!/bin/sh
 case ${1-} in
     reveal) [ "${2-}" = "-h" ] && exit 0; exec cat ;;
 esac
+# `edit -h` advertises --source (the reading-discussion posture): the
+# wrapper's guard probes for it and must find it here. This probe is
+# not a turn, so it never touches the log.
+[ "${1-}" = edit ] && [ "${2-}" = "-h" ] && { printf '  --source   discuss a source\n'; exit 0; }
 printf '%s\n' "$*" >> "$STUB_LOG"
 cat > "$STUB_LOG.stdin"
 case " $* " in
@@ -234,8 +238,10 @@ def main():
         b.expect("STUB-EDIT")
         got = logged().strip()
         ok(got.startswith("edit ? does it name a *price* --thread nb-")
-           and "--about a published article" in got and "--name the gate article" in got,
+           and "--about a news article" in got and "--name the gate article" in got,
            "the words run spark edit ? with thread, about and name", got)
+        ok("--source" in got,
+           "the reading-discussion posture: --source rides when spark advertises it", got)
         b.send("\r")
         b.close()
 
