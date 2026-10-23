@@ -8,8 +8,13 @@
   it had stopped. The pulse is no job of the shell now, so nothing
   reports it, and it is gone before its line is erased. dash (Debian,
   Void) and bash 5 were quiet already.
+- The pulse belongs to the part that reads the answer: it starts
+  there and stops there, at the first line or on Ctrl-C. Before, the
+  main shell kept the number of a pulse already gone for the whole
+  paced reveal, and a Ctrl-C there signalled that number.
 - A test: a slow answer, the screen read for the notice, and no pulse
-  left running once newsboat is back.
+  left running once newsboat is back, after an answer and after a
+  Ctrl-C in the wait.
 
 ## 2.4.0
 

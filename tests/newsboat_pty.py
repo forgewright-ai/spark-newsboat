@@ -185,6 +185,17 @@ def main():
             except OSError:
                 return ""
 
+        def no_pulse_left(what):
+            # a pulse is a fork of the wrapper: its command line is the
+            # wrapper's, which names this test's bin directory
+            try:
+                procs = subprocess.run(["ps", "-A", "-o", "command="], capture_output=True, text=True).stdout
+            except OSError:
+                print("  skip %s (no ps here)" % what)
+                return
+            left = [l for l in procs.splitlines() if os.path.join(bindir, "spark-newsboat") in l]
+            ok(not left, what, repr(left))
+
         def fresh(open_article=True):
             for p in (log, log + ".stdin", cache, cache + ".lock"):
                 if os.path.exists(p):
@@ -310,12 +321,23 @@ def main():
         b.send("\r")           # Enter after an answer: back to newsboat
         b.expect("gate opens at nine")
         time.sleep(0.8)
-        try:
-            procs = subprocess.run(["ps", "-A", "-o", "command="], capture_output=True, text=True).stdout
-            left = [l for l in procs.splitlines() if os.path.join(bindir, "spark-newsboat") in l]
-            ok(not left, "no pulse outlives the exchange", repr(left))
-        except OSError:
-            print("  skip no pulse outlives the exchange (no ps here)")
+        no_pulse_left("no pulse outlives the exchange")
+        b.close()
+
+        # F6. Ctrl-C in the wait stops the pulse too: it belongs to the
+        # subshell reading the answer, which stops it on SIGINT
+        b = fresh()
+        b.send(",s")
+        b.expect("chat>")
+        b.mark()
+        b.send("slow question\r")
+        ok(b.expect("reading"), "the pulse turns while the slow answer waits", b.plain()[-200:])
+        b.send("\x03")
+        time.sleep(0.8)
+        b.mark()
+        b.send("q")
+        ok(b.expect("gate article"), "newsboat is back after Ctrl-C in the wait", b.plain()[-200:])
+        no_pulse_left("no pulse outlives a Ctrl-C in the wait")
         b.close()
 
         # F3. a stub article says so instead of refusing; Enter returns

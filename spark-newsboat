@@ -86,25 +86,34 @@ pulse_stop() {
     printf '\r\033[2K' > /dev/tty
 }
 
-# read fills its variable even when the stream ends without a final
-# newline, but returns nonzero -- a one-line answer with no trailing
-# newline (spark edit streams raw) must not be mistaken for silence.
+# $1 is the pulse's label, the rest the spark argv. The pulse belongs
+# to the subshell that reads the answer: it starts there, beside the
+# model's stream, and stops there at the first line, or on Ctrl-C by
+# that subshell's own trap (POSIX lets a script's background job
+# ignore SIGINT; bash, dash and zsh let this one hear it, and the trap
+# holds for the rest). The main shell never holds a pulse that is
+# already gone. read fills its variable even when the stream ends
+# without a final newline, but returns nonzero -- a one-line answer
+# with no trailing newline (spark edit streams raw) must not be
+# mistaken for silence.
 answer() {
-    if spark reveal -h >/dev/null 2>&1; then
-        "$@" 2>&1 | {
-            IFS= read -r first; r=$?
-            [ -n "$first" ] || [ $r -eq 0 ] || { pulse_stop; exit 0; }
-            pulse_stop
+    label=$1
+    shift
+    reveal=
+    spark reveal -h >/dev/null 2>&1 && reveal=yes
+    "$@" 2>&1 | {
+        trap 'pulse_stop; exit 130' INT
+        pulse_start "$label"
+        IFS= read -r first; r=$?
+        pulse_stop
+        trap - INT
+        [ -n "$first" ] || [ $r -eq 0 ] || exit 0
+        if [ -n "$reveal" ]; then
             { printf '%s\n' "$first"; cat; } | wrapw | spark reveal
-        }
-    else
-        "$@" 2>&1 | {
-            IFS= read -r first; r=$?
-            [ -n "$first" ] || [ $r -eq 0 ] || { pulse_stop; exit 0; }
-            pulse_stop
+        else
             { printf '%s\n' "$first"; cat; } | wrapw
-        }
-    fi
+        fi
+    }
 }
 
 case ${1-} in
@@ -135,7 +144,7 @@ case ${1-} in
                | sed 's|https\{0,1\}://[^ ]*||g')
         [ "$(printf %s "$body" | tr -d '[:space:]' | wc -c | tr -d ' ')" -lt 120 ] && stub=yes
         old=$(stty -g < /dev/tty 2>/dev/null || true)
-        trap '[ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null; printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
+        trap 'printf "\033[?1049l" > /dev/tty; [ -z "$old" ] || stty "$old" < /dev/tty; exit 130' INT
         [ -z "$old" ] || stty sane < /dev/tty
         printf '\033[?1049h\033[2J\033[H' > /dev/tty
         feed=$(printf '%s\n' "$header" | sed -n 's/^Feed: //p' | head -n 1)
@@ -184,12 +193,11 @@ case ${1-} in
             fi
             printf '\n' > /dev/tty
             if [ -z "$asked" ]; then
-                pulse_start "reading $(printf %s "$art" | wc -c | tr -d ' ') characters"
+                label="reading $(printf %s "$art" | wc -c | tr -d ' ') characters"
             else
-                pulse_start "thinking"
+                label=thinking
             fi
-            printf '%s\n' "$art" | answer "$@" > /dev/tty
-            [ -z "${PULSE-}" ] || kill "$PULSE" 2>/dev/null
+            printf '%s\n' "$art" | answer "$label" "$@" > /dev/tty
             printf '\n\n' > /dev/tty
             asked=yes
         done
