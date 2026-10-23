@@ -42,6 +42,7 @@ cat > "$STUB_LOG.stdin"
 case " $* " in
     *" fail "*)   printf 'spark: the source does not answer -- it opens: "STUB-OPENING ..."\n' >&2; exit 1 ;;
     *" long "*)   i=0; while [ $i -lt 40 ]; do printf 'wrapword '; i=$((i+1)); done; printf '\n'; exit 0 ;;
+    *" slow "*)   sleep 1.2 ;;   # the pulse turns a few frames first
 esac
 case ${1-} in
     edit) printf 'STUB-EDIT with a mark [not in the text]' ;;   # NO trailing newline: raw stream
@@ -290,6 +291,31 @@ def main():
            and tid(lines[0]) == tid(lines[1]),
            "the follow-up rides the same thread", logged())
         b.send("\r")
+        b.close()
+
+        # F5. the wait's pulse ends without a word: no shell reports it
+        # on the screen (macOS's /bin/sh, bash 3.2, printed "Terminated:
+        # 15" and the pulse's whole source after every answer), and no
+        # pulse outlives the exchange
+        b = fresh()
+        b.send(",s")
+        b.expect("chat>")
+        b.mark()
+        b.send("slow question\r")
+        ok(b.expect("reading") and b.expect("STUB-EDIT", 15), "a slow answer shows after the pulse", b.plain()[-300:])
+        ok(b.expect("chat>", 5), "the prompt comes back after the slow answer", b.plain()[-300:])
+        b.read(1.0)
+        ok("Terminated" not in b.plain() and "while :" not in b.plain(),
+           "the pulse ends silently: no job notice on the screen", b.plain()[-400:])
+        b.send("\r")           # Enter after an answer: back to newsboat
+        b.expect("gate opens at nine")
+        time.sleep(0.8)
+        try:
+            procs = subprocess.run(["ps", "-A", "-o", "command="], capture_output=True, text=True).stdout
+            left = [l for l in procs.splitlines() if os.path.join(bindir, "spark-newsboat") in l]
+            ok(not left, "no pulse outlives the exchange", repr(left))
+        except OSError:
+            print("  skip no pulse outlives the exchange (no ps here)")
         b.close()
 
         # F3. a stub article says so instead of refusing; Enter returns

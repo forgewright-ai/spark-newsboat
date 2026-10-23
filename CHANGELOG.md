@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.4.1
+
+- The wait ends without a word. On macOS, whose /bin/sh is bash 3.2,
+  every answer ended with `line 86: <pid> Terminated: 15` and the
+  pulse's whole source on the screen: the shell reported the pulse
+  it had stopped. The pulse is no job of the shell now, so nothing
+  reports it, and it is gone before its line is erased. dash (Debian,
+  Void) and bash 5 were quiet already.
+- A test: a slow answer, the screen read for the notice, and no pulse
+  left running once newsboat is back.
+
 ## 2.4.0
 
 - The room is dressed: the title in bold, one meta line (feed,
