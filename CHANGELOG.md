@@ -12,6 +12,8 @@
   there and stops there, at the first line or on Ctrl-C. Before, the
   main shell kept the number of a pulse already gone for the whole
   paced reveal, and a Ctrl-C there signalled that number.
+- The wait's first frame is drawn at once, before the pulse starts, so
+  even an answer that comes at once shows what the wait was.
 - A test: a slow answer, the screen read for the notice, and no pulse
   left running once newsboat is back, after an answer and after a
   Ctrl-C in the wait.
